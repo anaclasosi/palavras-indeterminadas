@@ -64,7 +64,6 @@ def comparar_strings_set(s, tam):
 
     return str_saida
 
-
 def comparar_strings(str1, str2):   #Antigo
     """Realiza a comparação de duas strings"""
 
