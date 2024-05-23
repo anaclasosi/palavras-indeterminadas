@@ -1,3 +1,4 @@
+#cria palavras indeterminadas
 #Fechar todos n arquivos
 import sys
 simbolos = {'a','c','g','t','n'}
@@ -12,7 +13,7 @@ def main():
         arq.append(str(sys.argv[i]))
 
     s = []      #Lista com o conteudo dos arquivos
-    for i in range(a-1):
+    for i in range(a-2):
         s.append(abrir_arquivo(arq[i]))
 
     tam = maior_arquivo_texto(t,s)
@@ -25,7 +26,7 @@ def main():
     print("String escrita com sucesso no arquivo de saída!")
 
 def abrir_arquivo(nome):
-    """Recebe um arquivo e abre para a escrita"""
+    """Recebe um arquivo e abre para a leitura"""
     try:
         arq = open(nome, 'r')
         return arq.read()
@@ -44,6 +45,7 @@ def maior_arquivo_texto(t, s):
 def comparar_strings_set(s, tam):
     str_saida = ""
     aux = set()
+    vazio = set()
     
     for i in range(tam):            # Percorre as strings
         for j in range(len(s)):     # Percorre os índices da lista
@@ -54,10 +56,12 @@ def comparar_strings_set(s, tam):
                     aux.add(s[j][i])
             except:     # Quando um índice não puder ser acessado
                 continue
-        if aux == {}:   # Caso em que em todas as strings não tem um s[j][i] pertencente aos simbolos
+        if aux == vazio:   # Caso em que em todas as strings não tem um s[j][i] pertencente aos simbolos
             continue
         else:
-            for base in aux:
+            lista = list(aux)
+            lista.sort()        # Coloca em ordem
+            for base in lista:
                 str_saida += base
             str_saida += "/"
             aux.clear()
