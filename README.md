@@ -14,7 +14,7 @@ Python
 
 ### Palavras Indeterminadas
 
-O programa "1_Palavras_indeterminadas.py" gera palavras indeterminadas no arquivo saida.txt a partir de outros dois arquivos, neste caso 1.txt e 2.txt. 
+O programa "1_Palavras_indeterminadas.py" gera palavras indeterminadas no arquivo "saida.txt" a partir de outros dois arquivos, neste caso "1.txt" e "2.txt". 
 
 Utilize o seguinte comando para executar o programa:
 
