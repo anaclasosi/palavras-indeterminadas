@@ -7,6 +7,7 @@ Buscamos compreender e comparar dados genômicos, analisando a velocidade de pro
 ## Requisitos
 
 Compilador C++
+
 Python
 
 ## Exemplos
