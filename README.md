@@ -1,6 +1,6 @@
 # Algoritmo KMP
 
-Este repositório contém o algoritmo Knuth-Morris-Pratt (KMP) no método ... \[1,n\].
+Este repositório contém o algoritmo Knuth-Morris-Pratt (KMP) no método ...
 
 Buscamos compreender e comparar dados genômicos, analisando a velocidade de processamento em cada dado processado.
 
