@@ -4,7 +4,6 @@ import sys
 def main():
     arq = []
     for i in range(1, len(sys.argv)):
-        print(i, sys.argv[i])
         arq.append(abrir_arquivo(sys.argv[i]))
     q_texto = len(sys.argv)
     t_texto = len(arq[1])

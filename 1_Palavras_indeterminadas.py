@@ -1,7 +1,7 @@
 #cria palavras indeterminadas
-#Fechar todos n arquivos
+# TODO: Fechar todos n arquivos
 import sys
-simbolos = {'a','c','g','t','n'}
+simbolos = {'a','c','g','t','n', 'A','C','G','T','N'}
 
 def main():
 
