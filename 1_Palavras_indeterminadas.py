@@ -61,8 +61,14 @@ def comparar_strings_set(s, tam):
         else:
             lista = list(aux)
             lista.sort()        # Coloca em ordem
-            for base in lista:
-                str_saida += base
+            if 'N' in lista:
+                str_saida = 'N'
+            elif 'n' in lista:
+                str_saida = 'n'
+            else:
+                for base in lista:
+                    str_saida += base
+            
             str_saida += "/"
             aux.clear()
 

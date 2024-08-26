@@ -1,61 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-int KMP(char *texto, char *padrao);
-int kmp(char *texto, char *padrao); //novo
-int* prefixo(char *padrao, int m);
+/* Digitar o arquivo texto, padrão e o tipo do dado fornecido */
+
+//int KMP(char *texto, char *padrao); //antigo
+int kmp(char *texto, char *padrao, int tipo);
+int* prefixo(char *padrao, int m, int tipo); 
+int cmp(char texto, char padrao, int tipo);
+int INDET(char texto, char padrao, int tipo);
+
+enum TIPO {REGULAR, PRIMOS, BINARIO};
 
 int main(int argc, char **argv){ 
 
-    if(argc != 3){
+    if(argc != 4){ 
         exit(EXIT_FAILURE);
     }
 
-    FILE *tex = fopen(argv[1], "rb");   //Abre binário
-    if(tex == NULL){
-        perror("Erro ao abrir arquivo texto_binario.");
-    return 1;
-    } 
-
-    fseek(tex, 0, SEEK_END); //fseek deixa no último bite do arquivo
-    size_t tamtex = ftell(tex)/sizeof(int); //ftell responde quantos bites tem no arquivo
-    rewind(tex);
-
-    int *texto = (int *)malloc(tamtex*sizeof(int)); //malloc recebe a quantidade de bites e reserva na memória
-    if (texto == NULL) exit(EXIT_FAILURE);
-
-    FILE *pad = fopen(argv[2], "rb");
-    if(pad == NULL){
-        perror("Erro ao abrir arquivo padrao_binario."); 
-    return 1;
-    }
-    
-    fseek(pad, 0, SEEK_END);
-    size_t tampad = ftell(pad)/sizeof(int);
-    rewind(pad);
-
-    int *padrao = (int *)malloc(tampad*sizeof(int)); 
-    if (padrao == NULL) exit(EXIT_FAILURE);
+    int tipo;
+    tipo = atoi(argv[4]);
  
-    fread(texto, 4, tamtex, tex);      //Precisa ler cada numero e separar com: / (usar for ou while?)
-    fread(padrao, 4, tampad, pad);
-    size_t i;
-    for(i=0; i<tamtex; i++)
-        printf("%d\t%d\n", i, texto[i]);
-    //printf("%s\n FIM2 \n", padrao);                                        //Imprime o padrao
+        FILE *tex = fopen(argv[1], "r");    //lendo apenas txt
+        if(tex == NULL){
+            perror("Erro ao abrir arquivo texto.");
+        return 1;
+        } 
 
-    kmp(texto, padrao);                                            //KMP
+        fseek(tex, 0, SEEK_END); //fseek deixa no último bite do arquivo
+        size_t tamtex = ftell(tex); //ftell responde quantos bites tem no arquivo
+        rewind(tex);
 
-    fclose(tex);
-    fclose(pad);
+        char *texto = (char *)malloc(tamtex+1); //malloc recebe a quantidade de bites
+        if (texto == NULL) exit(EXIT_FAILURE);
+
+        FILE *pad = fopen(argv[2], "r");
+        if(pad == NULL){
+            perror("Erro ao abrir arquivo padrao."); 
+        return 1;
+        }
+
+        fseek(pad, 0, SEEK_END);
+        size_t tampad = ftell(pad);
+        rewind(pad);
+
+        char *padrao = (char *)malloc(tampad+1); 
+        if (padrao == NULL) exit(EXIT_FAILURE);
+
+        fscanf(tex, "%s", texto);
+        fscanf(pad, "%s", padrao);
+
+        kmp(texto, padrao, tipo);              
+        fclose(tex);
+        fclose(pad);
+    
     return 0;
 }
 
-int kmp(char *texto, char *padrao){
+int kmp(char *texto, char *padrao, int tipo){
     int n = strlen(texto), m = strlen(padrao);
-
-    int *pi = prefixo(padrao, m);
+    
+    int *pi = prefixo(padrao, m, tipo);
 
     //for(int i=0; i<m; i++) printf("%d ", pi[i]); printf("\n");  //Imprime o pi
 
@@ -65,17 +71,16 @@ int kmp(char *texto, char *padrao){
         return 1;
     }
 
-    int j = 0, i = 0; 
+    int j = 0, i = 0;
 
-    while (j < n) {
-        if (padrao[i] == texto[j]) { //Se igual passa para a próxima comparação
+    while (j < n) {        
+        if (cmp(padrao[i], texto[j], tipo)) { //Se for similar passa para a próxima comparação
             i++;
             j++;
 
-            if (i == m) { // Quando a comparação chega ao final do padrão, ou seja, deu certo
-                //TODO: escrever a saída em um arquivo
-                printf("Padrão encontrado na posição %d\n", j - i);
-                fprintf(res, "Padrão encontrado na posição %d\n", j-i); //Escreve no arquivo result.txt
+            if (i == m) { // Ocorre quando a comparação chega ao final do padrão
+                printf("Padrão encontrado na posição %d\n", j-i);
+                fprintf(res, "Padrão encontrado na posição %d\n", j-i);   //Escreve no arquivo result.txt
                 i = pi[i - 1];
             }
         } 
@@ -92,7 +97,7 @@ int kmp(char *texto, char *padrao){
     return 0;
 }
 
-int* prefixo(char *padrao, int m){
+int* prefixo(char *padrao, int m, int tipo){
 
     int *pi = (int *)malloc(m *sizeof(int));
     if (pi == NULL) exit(EXIT_FAILURE);
@@ -101,10 +106,10 @@ int* prefixo(char *padrao, int m){
     pi[0] = 0;  // O primeiro valor sempre é 0 porque não tem comparação
 
     for (int q = 1; q < m; q++){
-        while (k > 0 && padrao[k] != padrao[q]){
+        while (k > 0 && (cmp(padrao[q], padrao[k], tipo) == 0)){                   //padrao[k] != padrao[q]
             k = pi[k - 1];
         }
-        if (padrao[q] == padrao[k]){
+        if (cmp(padrao[q], padrao[k], tipo)==1){                                      //padrao[q] == padrao[k]
             k++;
         }
         pi[q] = k;
@@ -112,7 +117,57 @@ int* prefixo(char *padrao, int m){
     return pi;
 }
 
-int KMP(char *texto, char *padrao){ //ANTIGO
+int cmp(char texto, char padrao, int tipo){
+
+    INDET(texto, padrao, tipo) ? tipo = REGULAR : ;
+
+    if(tipo==REGULAR){
+        if(texto == padrao){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+    else if(tipo == PRIMOS){
+        if(padrao % texto == 0 || texto % padrao == 0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+    else if(tipo == BINARIO){
+        if(padrao & texto != 0){
+            return 1;
+        }
+    }
+}
+
+int INDET(char texto, char padrao, int tipo){
+    if(tipo == PRIMOS){
+        int primos[] = {2, 3, 5, 7};    //TODO: não está conferindo direito ainda
+        for (int i = 0; i < 3; i++){
+            if (primos[i] == texto && primos[i] == padrao){
+                return true;  // Retorna true se o caractere for encontrado
+            }
+    }
+    return false;  // Retorna false se o caractere não for encontrado
+}
+    if(tipo == BINARIO){
+        int binarios[] = {1, 2, 4, 8};    //TODO: não está conferindo direito ainda(alterar n no mapeamento binarios)
+        for (int i = 0; i < 3; i++){
+            if (binarios[i] == texto && binarios[i] == padrao){
+                return true;  // Retorna true se o caractere for encontrado
+            } 
+    }
+    return false;
+}
+    return true;  //Se for regular
+}
+
+/*
+int KMP(char *texto, char *padrao){ // modelo ANTIGO
     int m = strlen(padrao), n = strlen(texto);
 
     int *pi = prefixo(padrao, m);
@@ -143,3 +198,4 @@ int KMP(char *texto, char *padrao){ //ANTIGO
     free(pi);
     return 0;
 }
+*/

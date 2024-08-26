@@ -1,6 +1,8 @@
 #Cria arquivo com numeros primos e binário 
 import sys
-nucleotideos = {"a":2, "c":3, "g":5, "t":7, "n":11,  "A":2, "C":3, "G":5, "T":7, "N":11}
+nucleotideos = {"a":2, "c":3, "g":5, "t":7, "n":210,  "A":2, "C":3, "G":5, "T":7, "N":210}
+
+#quando N --> entrada == /a,c,g,t/ == /210/
 
 def main():
     s = abrir_arquivo(sys.argv[1])
@@ -28,6 +30,7 @@ def num_primo(s):
             lista_primos.append(acc)
             acc = 1
         else:
+
             acc = acc*nucleotideos[s[i]]
     return str_primos, lista_primos
 
@@ -40,7 +43,7 @@ def escrever_arquivo_bin (lista_primos, nome_arquivo):
     try:
         arq = open(nome_arquivo, 'wb')
         for item in lista_primos:
-            arq.write(item.to_bytes(4, byteorder='little', signed=True))
+            arq.write(item.to_bytes(1, byteorder='little', signed=True))
     except:
         print("escrever_arquivo_bin: Não foi possivel abrir o arquivo")
 
@@ -50,7 +53,7 @@ def decodificar_binario(binario):
         str_bin_tex = ""
     except:
         print("decodificar_binario: erro ao abrir arquivo")
-    x = bin.read(4)
+    x = bin.read(1)
     while True:
         y = int.from_bytes(x, byteorder='little', signed=True) 
         str_bin_tex += str(y) + "/"
@@ -58,11 +61,7 @@ def decodificar_binario(binario):
         if not x:
             break
     bin.close()
-    '''
-    for item in bin: # seleciona uma linha de binarios do arquivo
-        for num in item: # seleciona um byte da linha
-            str_bin_tex += str(num) + "/"
-    '''
+
     return str_bin_tex
         
 if __name__ == "__main__":

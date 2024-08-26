@@ -1,6 +1,6 @@
 '''O programa recebe uma palavra indeterminada e a converte para números binários'''
 import sys
-nucleotideos = {"a":1, "c":2, "g":4, "t":8, "n":16,  "A":1, "C":2, "G":4, "T":8, "N":16}
+nucleotideos = {"a":1, "c":2, "g":4, "t":8, "n":15,  "A":1, "C":2, "G":4, "T":8, "N":15}
 
 def main():
     arq = abrir_arquivo(sys.argv[1])
@@ -42,7 +42,7 @@ def escrever_arquivo_bin (lista_primos, nome_arquivo):
     try:
         arq = open(nome_arquivo, 'wb')
         for item in lista_primos:
-            arq.write(item.to_bytes(4, byteorder='little', signed=True))
+            arq.write(item.to_bytes(1, byteorder='little', signed=True))
     except:
         print("escrever_arquivo_bin: Não foi possivel abrir o arquivo")
 
@@ -52,7 +52,7 @@ def decodificar_binario(binario):
         str_bin_tex = ""
     except:
         print("decodificar_binario: erro ao abrir arquivo")
-    x = bin.read(4)
+    x = bin.read(1)
     while True:
         y = int.from_bytes(x, byteorder='little', signed=True) 
         str_bin_tex += str(y) + "/"
@@ -60,11 +60,7 @@ def decodificar_binario(binario):
         if not x:
             break
     bin.close()
-    '''
-    for item in bin: # seleciona uma linha de binarios do arquivo
-        for num in item: # seleciona um byte da linha
-            str_bin_tex += str(num) + "/"
-    '''
+    
     return str_bin_tex
 
 if __name__ == "__main__":
