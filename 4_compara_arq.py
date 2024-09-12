@@ -1,4 +1,4 @@
- # Compara os arquivos
+'''Compara os arquivos'''
 import sys
 
 def main():

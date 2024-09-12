@@ -1,4 +1,4 @@
-# muda de primos para nucleotídeos
+'''Altera de primos para nucleotídeos'''
 import sys
 
 def main():

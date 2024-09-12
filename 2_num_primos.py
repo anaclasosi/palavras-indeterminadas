@@ -1,8 +1,6 @@
-#Cria arquivo com numeros primos e binário 
+'''O programa cria um arquivo com numeros primos e em binario''' 
 import sys
 nucleotideos = {"a":2, "c":3, "g":5, "t":7, "n":210,  "A":2, "C":3, "G":5, "T":7, "N":210}
-
-#quando N --> entrada == /a,c,g,t/ == /210/
 
 def main():
     s = abrir_arquivo(sys.argv[1])
@@ -57,7 +55,7 @@ def decodificar_binario(binario):
     while True:
         y = int.from_bytes(x, byteorder='little', signed=True) 
         str_bin_tex += str(y) + "/"
-        x = bin.read(4)
+        x = bin.read(1)
         if not x:
             break
     bin.close()

@@ -56,7 +56,7 @@ def decodificar_binario(binario):
     while True:
         y = int.from_bytes(x, byteorder='little', signed=True) 
         str_bin_tex += str(y) + "/"
-        x = bin.read(4)
+        x = bin.read(1)
         if not x:
             break
     bin.close()
