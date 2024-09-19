@@ -8,13 +8,13 @@ int primos[] = {0, 0, 1, 1, 0, 1, 0, 1};
 int binarios[] = {0, 1, 1, 0, 1, 0, 0, 0, 1};
 
 int kmp(char *text, char *pad, int tipo);
-int* padrao_regular (char *pad, int m, int tipo);
+int padrao_regular (char *pad, int m, int tipo);
 int* border(char *pad, int m, int tipo); 
 int cmp(char text, char pad, int tipo);
 int INDET(char text, int tipo);
 int set_indety(int i, int j, int rigth_pos);
 int compute_shift(bool indety, char *text, char *pad, int i, int j, int *borda, int l);
-int prefixo(char *compq);
+int* prefixo(char *compq);
 char* substring(const char* str, int start, int end);
 char* concatenar(const char* str1, const char* str2);
 
@@ -27,7 +27,7 @@ int main(int argc, char **argv){
     }
 
     int tipo;
-    tipo = atoi(argv[4]);
+    tipo = atoi(argv[3]);
  
         FILE *tex = fopen(argv[1], "rb"); 
         if(tex == NULL){
@@ -42,25 +42,25 @@ int main(int argc, char **argv){
         char *text = (char *)malloc(tamtex+1); //malloc recebe a quantidade de bites
         if (text == NULL) exit(EXIT_FAILURE);
 
-        FILE *pad = fopen(argv[2], "rb");
-        if(pad == NULL){
+        FILE *pat = fopen(argv[2], "r");
+        if(pat == NULL){
             perror("Erro ao abrir arquivo pad."); 
         return 1;
         }
 
-        fseek(pad, 0, SEEK_END);
-        size_t tampad = ftell(pad);
-        rewind(pad);
+        fseek(pat, 0, SEEK_END);
+        size_t tampad = ftell(pat);
+        rewind(pat);
 
         char *pad = (char *)malloc(tampad+1); 
         if (pad == NULL) exit(EXIT_FAILURE);
 
         fscanf(tex, "%s", text);
-        fscanf(pad, "%s", pad);
+        fscanf(pat, "%s", pad);
 
         kmp(text, pad, tipo);              
         fclose(tex);
-        fclose(pad);
+        fclose(pat);
     
     return 0;
 }
@@ -68,14 +68,9 @@ int main(int argc, char **argv){
 int kmp(char *text, char *pad, int tipo){
     int n = strlen(text), m = strlen(pad);
 
-    char* ql = padrao_regular(pad, m, tipo); // funçao que vê até onde o pad é regular
+    int l = padrao_regular(pad, m, tipo); // Funcao ate onde o pad é regular
     
-    for(int j=0; j<m; j++) printf("%d ", ql[j]); printf("\n"); //Imprime o ql
-    
-    int l = strlen(ql);
-    int *borda = border(ql, l, tipo); // alterar para receber ql
-
-    for(int j=0; j<m; j++) printf("%d ", borda[j]); printf("\n");  //Imprime o borda
+    int *borda = border(pad, l, tipo);    // Calcula a borda
 
     FILE *res = fopen("result.txt", "w");
     if(res == NULL){
@@ -87,8 +82,10 @@ int kmp(char *text, char *pad, int tipo){
     bool indety = false;
     int rigth_pos = 0;
 
-    while (i < n) {        
+    while (i < n) {   
+            
         if (cmp(pad[j], text[i], tipo)){ //Se for similar passa para a próxima comparação
+            printf("Confere %d\n", i);
             if (INDET(text[i], tipo)){
                 indety = true;
                 rigth_pos = i;
@@ -97,8 +94,8 @@ int kmp(char *text, char *pad, int tipo){
             i++;
 
             if (j == m) { // Ocorre quando a comparação chega ao final do padrão
-                printf("Padrão encontrado na posição %d\n", i-j);
-                fprintf(res, "Padrão encontrado na posição %d\n", i-j);   //Escreve no arquivo result.txt
+                printf("Padrao encontrado na posicao %d\n", i-j);
+                fprintf(res, "Padrao encontrado na posicao %d\n", i-j);   //Escreve no arquivo result.txt
                 j = compute_shift(indety, text, pad, i, j, borda, l);
                 indety = set_indety(i, j, rigth_pos);
             }
@@ -109,41 +106,39 @@ int kmp(char *text, char *pad, int tipo){
             } 
             else{ //Define j<i para voltar a comparar
                 j = compute_shift(indety, text, pad, i, j, borda, l);
-                indety = set_indety(i, j, rigth_pos); 
+                set_indety(i, j, rigth_pos); 
             }
         }
     }
-    free(ql);
     free(borda);
     return 0;
 }
 
-int* padrao_regular (char *pad, int m, int tipo){
-    int *ql = (int *)malloc(m *sizeof(int));
-    if (ql == NULL) exit(EXIT_FAILURE);
+int padrao_regular (char *pad, int m, int tipo){
 
     if(tipo == REGULAR){
-        return pad; 
+        return m; 
     }
 
     else if(tipo == PRIMOS){
 
         for(int i=0; i<m; i++){
-            if(pad[i] > 7) return ql;
+            if(pad[i] > 7) return i;
             else
-                if(primos[pad[i]]==0) return ql;      
-            ql[i] = pad[i];
+                if(primos[pad[i]]==0) return i;      
         }
+        return m;
     }
-    else if(tipo == BINARIO){
+    else if (tipo == BINARIO){
         for(int i=0; i<m; i++){
-            if(pad[i] > 8) return ql;
+            if(pad[i] > 8) return i;
             else
-                if(binarios[pad[i]]==0) return ql; 
-            ql[i] = pad[i];
+                if(binarios[pad[i]]==0) return i; 
         }
+        return m;
     }
-    return ql;
+
+    else perror("Tipo de dado inválido ou inexistente"); return 1;
 }
 
 int* border(char *pad, int m, int tipo){
@@ -187,7 +182,9 @@ int cmp(char text, char pad, int tipo){
 
     else if(tipo == BINARIO){
         
-        if((pad & text) != 0) return true;
+        if((pad & text) != 0){
+            return true;
+        }
         else return false;
     }
 }
@@ -211,7 +208,9 @@ int INDET(char simbolo, int tipo){
 }
 
 int set_indety(int i, int j, int rigth_pos){
-    
+
+    int k = i-j;
+
     if (k < rigth_pos && j > rigth_pos) return true;
     else return false;
 }
@@ -220,16 +219,28 @@ int compute_shift(bool indety, char *text, char *pad, int i, int j, int *borda, 
     int max = 0;
 
     if(indety || j<l){
-        //compq = pad[1:j] + text[i-j+1:i];
+        //compq = pad[0:j] + text[i-j+1:i];
         char* subPadrao = substring(pad, 0, j); 
+
+        printf("Subpadrao\n");
+        for(int i = 0; i<(int)strlen(subPadrao); i++) printf(" %c ", subPadrao[i]); printf("\n");
+
+        printf("Subtexto\n");
         char* subTexto = substring(text, i-j+1, i); 
+        for(int i = 0; i<(int)strlen(subTexto); i++) printf(" %c ", subTexto[i]); printf("\n");
         char* compq = concatenar(subPadrao, subTexto);
 
+        printf("Comparacao q \n");
+        for(int i = 0; i<(int)strlen(compq); i++) printf("%d ", compq[i]); printf("\n");  //Imprime o compq
+        printf("FIM Compute_shift \n");
+        
         if (compq == NULL) return 0;
         int* picompq = prefixo(compq);
+        for(int i = 0; i<(int)strlen(compq); i++) printf("%d ", picompq[i]); printf("\n");  //Imprime o prefixo
+
         max = 0;
-        for(int r = j; r<2*(j-2)){
-            if(max < picompq[r] && picompq[r] = 2*j-r-2) max = picompq[r];
+        for(int r = j; r<2*(j); r++){
+            if (max < picompq[r] && picompq[r] == 2*j-r) max = picompq[r];
         j = max;
         }
     }
@@ -238,23 +249,27 @@ int compute_shift(bool indety, char *text, char *pad, int i, int j, int *borda, 
 }
 
 int* prefixo(char *compq){
-    int ind = 0, r = 1, tam = strlen(compq), j;
+    int ind = 0, r = 1, tam = strlen(compq), j = 0;
     int* picompq = (int*)malloc(tam * sizeof(int));
     if (picompq == NULL) exit(EXIT_FAILURE);
     picompq[0] = tam;
-        while (compq[j] == compq[ind]){
-        j = r;
-        while (compq[j] == compq[ind]){
-        picompq[r] = ind;    //iniciar picompq
-            j++;
-        picompq[r] = ind;    //iniciar picompq
-        ind = 0;
+        for (r; r<tam; r++){
+            j = r;
+            while (compq[j] == compq[ind]){
+                picompq[r] = ind;    //iniciar picompq
+                j++;
+                ind++;
+            }
+            picompq[r] = ind;    //iniciar picompq
+            ind = 0;
         }
-    }
     return picompq;
 }
 
 char* substring(const char* str, int start, int end){
+
+    if (str == NULL) return NULL;
+
     // Função para extrair uma substring
     if (start > end || start < 0 || end >= (int)strlen(str)) return NULL;  // Se os índices forem inválidos
     

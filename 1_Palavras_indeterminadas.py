@@ -62,9 +62,9 @@ def comparar_strings_set(s, tam):
             lista = list(aux)
             lista.sort()   # Coloca a lista em ordem alfabetica
             if 'N' in lista:
-                str_saida = 'N'
+                str_saida += 'N'
             elif 'n' in lista:
-                str_saida = 'n'
+                str_saida += 'n'
             else:
                 for base in lista:
                     str_saida += base

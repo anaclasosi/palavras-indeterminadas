@@ -21,6 +21,7 @@ def abrir_arquivo(nome):
 def num_primo(s):
     str_primos = ""
     lista_primos = []
+    
     acc = 1
     for i in range(len(s)):
         if s[i] == "/":
@@ -28,8 +29,8 @@ def num_primo(s):
             lista_primos.append(acc)
             acc = 1
         else:
-
             acc = acc*nucleotideos[s[i]]
+            
     return str_primos, lista_primos
 
 def escrever_arquivo_texto (primos, nome_arquivo):
